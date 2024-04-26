@@ -1,0 +1,14 @@
+cd /home/ale/VSCode/PruebaDevOps
+
+docker network create frontend_net
+docker network create backend_net
+
+
+docker run -d --name mariadb --env MARIADB_ROOT_PASSWORD="123" --network backend_net mariadb:latest
+docker run -d --name wordpress --network backend_net --network frontend_net -d wordpress
+docker run -d --name http_echo --network frontend_net hashicorp/http-echo -listen=:7878 -text="Bienvenido Prueba DevOps"
+
+docker run --name proxy_inverso --network frontend_net -p80:80 -p7878:7878 -v /home/ale/VSCode/PruebaDevOps/despliegue/nginx.conf:/etc/nginx/nginx.conf  nginx
+
+   
+ 

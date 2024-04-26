@@ -1,0 +1,48 @@
+version: '3'
+
+networks:
+  frontend_net:
+  backend_net:
+
+services:
+
+  mariadb:
+    image: mariadb:latest
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ale
+      MARIADB_ROOT_DATABASE: ale
+      MARIADB_USER: ale
+      MARIADB_PASSWORD: ale
+
+    networks:
+      - backend_net
+
+  wordpress:
+    image: wordpress
+    networks:
+      - backend_net
+      - frontend_net
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_USER: ale
+      WORDPRESS_DB_PASSWORD: ale
+      WORDPRESS_DB_NAME: ale
+
+  http_echo:
+    image: hashicorp/http-echo
+    command: -listen=:7878 -text="Bienvenido Prueba DevOps"
+    networks:
+      - frontend_net
+
+  proxy_inverso:
+    image: nginx
+    ports:
+      - "80:80"
+      - "7878:7878"
+    volumes:
+      - /home/ale/VSCode/PruebaDevOps/despliegue/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - frontend_net
+
